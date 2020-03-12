@@ -4,7 +4,8 @@ var rply = {
 	text: ''
 }; //type是必需的,但可以更改
 //heroku labs:enable runtime-dyno-metadata -a <app name>
-
+const util = require('util');
+const gis = require('g-i-s');
 const wiki = require('wikijs').default;
 const timer = require('timer');
 const translate = require('@vitalets/google-translate-api');
@@ -87,6 +88,9 @@ rollDiceCommand = async function (inputStr, mainMsg, groupid, userid, userrole, 
 			});
 			return rply;
 		case /\S+/.test(mainMsg[1]) && /^[.]image$/.test(mainMsg[0]):
+
+			const gisAsync = util.promisify(gis('cats', logResults));
+			gisAsync().then(obj => console.log(obj));
 			if (mainMsg[1].match(/^yesno$/i)) {
 				//隨機YES NO
 				let A = ['yes', 'no']
@@ -105,6 +109,14 @@ rollDiceCommand = async function (inputStr, mainMsg, groupid, userid, userrole, 
 				}).catch(err => {
 					return null
 				})
+
+			function logResults(error, results) {
+				if (error) {
+					console.log(error);
+				} else {
+					console.log(JSON.stringify(results, null, '  '));
+				}
+			}
 			rply.type = 'image'
 			return rply;
 		case /\S+/.test(mainMsg[1]) && /^[.]imagee$/.test(mainMsg[0]):
